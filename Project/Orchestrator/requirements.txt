@@ -1,0 +1,6 @@
+Flask
+Flask-SQLAlchemy
+requests
+pika
+docker
+kazoo

@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  rides:
+
+    container_name: rides
+    image: rides:latest
+    restart: always
+    volumes:
+      - /home/ubuntu/Rides:/rideshare
+    environment:
+      - TEAM_NAME=CC_0275_0950_1346_1633 
+    build: .
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000" 
+    ports:
+      - "8000:8000"
+
+  users:
+    container_name: users
+    image: users:latest
+    restart: always
+    volumes:
+      - /home/ubuntu/User:/rideshare
+    environment:
+      - TEAM_NAME=CC_0275_0950_1346_1633 
+    build: .
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8080"   
+    ports:
+      - "8080:8080"
+    

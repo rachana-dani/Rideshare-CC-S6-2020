@@ -1,0 +1,73 @@
+version: '3.1'
+
+services:
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      
+  orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: orchestrator
+    command: sh -c "pwd && ls && sleep 40 && python orchestrator.py"
+    volumes:
+    - .:/code
+    - /var/run/docker.sock:/var/run/docker.sock
+    links:
+    - rabbitmq
+    depends_on:
+    - rabbitmq
+    restart: on-failure
+    expose:
+      - "80"
+    ports:
+      - 80:80
+
+  zoo1:
+    image: zookeeper
+    restart: always
+    container_name: zookeeper
+    hostname: zoo1
+    ports:
+      - 2181:2181
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181
+      
+  master:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: worker_master
+    command: sh -c "ls && sleep 60 && python master.py"
+    volumes:
+    - .:/code
+    links:
+    - rabbitmq
+    depends_on:
+    - rabbitmq
+    restart: on-failure
+
+  slave:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: worker_slave
+    command: sh -c "pwd && sleep 70 && ls && ./create_worker.sh 0"
+    volumes:
+    - .:/code
+    links:
+    - rabbitmq
+    - master
+    depends_on:
+    - rabbitmq
+    - master
+    restart: on-failure
+volumes:
+    master_volume:
+
+
