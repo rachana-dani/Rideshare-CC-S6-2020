@@ -1,4 +1,5 @@
 # Rideshare
+
 The project is a distributed system of three instances
 1. User
 2. Ride
